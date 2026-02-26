@@ -1644,129 +1644,194 @@ class NutritionCalculator {
         const pageWidth = pdf.internal.pageSize.width;
         const pageHeight = pdf.internal.pageSize.height;
         
-        // Page Header
+        // Elegant Page Header with Gradient Effect
         pdf.setFillColor(46, 204, 113);
-        pdf.rect(0, 0, pageWidth, 40, 'F');
+        pdf.rect(0, 0, pageWidth, 35, 'F');
+        
+        // Header shadow effect
+        pdf.setFillColor(40, 180, 99);
+        pdf.rect(0, 32, pageWidth, 3, 'F');
         
         pdf.setTextColor(255, 255, 255);
-        pdf.setFontSize(22);
+        pdf.setFontSize(20);
         pdf.setFont('helvetica', 'bold');
-        pdf.text('DAILY MEAL PLAN & PREP SCHEDULE', 20, 25);
+        pdf.text('DAILY MEAL PLAN & PREP SCHEDULE', pageWidth/2, 22, {align: 'center'});
         
-        let yPos = 60;
+        let yPos = 50;
+        const leftColumn = 15;
+        const rightColumn = pageWidth/2 + 10;
+        const columnWidth = pageWidth/2 - 25;
         
-        // Weekly meal schedule
-        weekDays.forEach((day, index) => {
-            if (yPos > pageHeight - 100) {
-                pdf.addPage();
-                yPos = 30;
-            }
+        // Create 2-column layout for days (3.5 days per column)
+        const leftDays = weekDays.slice(0, 4); // Mon-Thu
+        const rightDays = weekDays.slice(4);   // Fri-Sun
+        
+        // LEFT COLUMN - First 4 days
+        pdf.setFillColor(248, 249, 250);
+        pdf.rect(leftColumn, yPos - 5, columnWidth, 145, 'F');
+        
+        let leftYPos = yPos;
+        leftDays.forEach((day, index) => {
+            // Compact day header
+            const dayColor = [
+                [255, 99, 71],   // Monday
+                [255, 165, 0],   // Tuesday  
+                [255, 215, 0],   // Wednesday
+                [50, 205, 50]    // Thursday
+            ][index];
             
-            // Day header
-            const dayColors = [
-                [255, 99, 71],   // Monday - Tomato
-                [255, 165, 0],   // Tuesday - Orange
-                [255, 215, 0],   // Wednesday - Gold
-                [50, 205, 50],   // Thursday - Lime Green
-                [30, 144, 255],  // Friday - Dodger Blue
-                [138, 43, 226],  // Saturday - Blue Violet
-                [255, 20, 147]   // Sunday - Deep Pink
-            ];
-            
-            pdf.setFillColor(dayColors[index][0], dayColors[index][1], dayColors[index][2]);
-            pdf.rect(20, yPos, pageWidth - 40, 15, 'F');
+            pdf.setFillColor(dayColor[0], dayColor[1], dayColor[2]);
+            pdf.rect(leftColumn + 2, leftYPos, columnWidth - 4, 12, 'F');
             
             pdf.setTextColor(255, 255, 255);
-            pdf.setFontSize(12);
-            pdf.setFont('helvetica', 'bold');
-            pdf.text(`${day.dayName.toUpperCase()} - ${day.dateStr}`, 25, yPos + 10);
-            
-            yPos += 20;
-            
-            // Meal plan for the day
-            pdf.setTextColor(51, 51, 51);
             pdf.setFontSize(9);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(`${day.dayName.toUpperCase()}`, leftColumn + 5, leftYPos + 8);
+            
+            leftYPos += 15;
+            
+            // Compact meals
+            pdf.setTextColor(51, 51, 51);
+            pdf.setFontSize(7);
             pdf.setFont('helvetica', 'normal');
             
             const meals = this.getDayMealPlan(day.dayName);
-            meals.forEach(meal => {
+            meals.slice(0, 3).forEach(meal => { // Only show first 3 meals to save space
                 pdf.setFont('helvetica', 'bold');
-                pdf.text(`${meal.time} ${meal.name}:`, 25, yPos);
+                pdf.text(`${meal.time}`, leftColumn + 5, leftYPos);
                 pdf.setFont('helvetica', 'normal');
-                const lines = pdf.splitTextToSize(meal.description, pageWidth - 100);
-                pdf.text(lines, 70, yPos);
-                yPos += Math.max(lines.length * 4, 8);
+                const shortDesc = meal.description.substring(0, 45) + '...';
+                pdf.text(shortDesc, leftColumn + 25, leftYPos);
+                leftYPos += 8;
             });
             
-            yPos += 10;
+            leftYPos += 3;
         });
         
-        // Prep Schedule Box
-        if (yPos > pageHeight - 120) {
-            pdf.addPage();
-            yPos = 30;
-        }
+        // RIGHT COLUMN - Last 3 days  
+        pdf.setFillColor(248, 249, 250);
+        pdf.rect(rightColumn, yPos - 5, columnWidth, 145, 'F');
         
+        let rightYPos = yPos;
+        rightDays.forEach((day, index) => {
+            // Compact day header
+            const dayColor = [
+                [30, 144, 255],  // Friday
+                [138, 43, 226],  // Saturday
+                [255, 20, 147]   // Sunday
+            ][index];
+            
+            pdf.setFillColor(dayColor[0], dayColor[1], dayColor[2]);
+            pdf.rect(rightColumn + 2, rightYPos, columnWidth - 4, 12, 'F');
+            
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(9);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(`${day.dayName.toUpperCase()}`, rightColumn + 5, rightYPos + 8);
+            
+            rightYPos += 15;
+            
+            // Compact meals
+            pdf.setTextColor(51, 51, 51);
+            pdf.setFontSize(7);
+            pdf.setFont('helvetica', 'normal');
+            
+            const meals = this.getDayMealPlan(day.dayName);
+            meals.slice(0, 3).forEach(meal => { // Only show first 3 meals
+                pdf.setFont('helvetica', 'bold');
+                pdf.text(`${meal.time}`, rightColumn + 5, rightYPos);
+                pdf.setFont('helvetica', 'normal');
+                const shortDesc = meal.description.substring(0, 45) + '...';
+                pdf.text(shortDesc, rightColumn + 25, rightYPos);
+                rightYPos += 8;
+            });
+            
+            rightYPos += 3;
+        });
+        
+        // PREP SCHEDULE SECTION - Compact and Elegant
+        yPos = 210;
+        
+        // Create elegant prep schedule box
         pdf.setFillColor(240, 248, 255);
         pdf.setDrawColor(30, 144, 255);
-        pdf.rect(20, yPos, pageWidth - 40, 80, 'FD');
+        pdf.setLineWidth(2);
+        pdf.rect(15, yPos, pageWidth - 30, 55, 'FD');
         
-        pdf.setTextColor(30, 144, 255);
-        pdf.setFontSize(14);
+        // Prep schedule header with icon effect
+        pdf.setFillColor(30, 144, 255);
+        pdf.rect(15, yPos, pageWidth - 30, 18, 'F');
+        
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(12);
         pdf.setFont('helvetica', 'bold');
-        pdf.text('WEEKLY PREP SCHEDULE', 25, yPos + 15);
+        pdf.text('WEEKLY PREP SCHEDULE', pageWidth/2, yPos + 12, {align: 'center'});
         
+        // Compact prep tasks in 2 columns
         pdf.setTextColor(51, 51, 51);
-        pdf.setFontSize(9);
+        pdf.setFontSize(8);
         pdf.setFont('helvetica', 'normal');
         
         const prepTasks = [
-            'SUNDAY: Wash and chop vegetables, soak lentils, prepare spice mixes',
-            'MONDAY: Cook rice for 2 days, prepare sambar base, boil eggs',
-            'WEDNESDAY: Mid-week prep - refresh vegetables, prepare curry base',
-            'FRIDAY: Weekend prep - make larger batches, prepare snack items',
-            'DAILY: Morning coffee setup, evening buttermilk preparation'
+            'SUN: Wash vegetables, soak lentils, spice prep',
+            'MON: Cook rice batch, sambar base, boil eggs', 
+            'WED: Refresh vegetables, curry base prep',
+            'FRI: Weekend batches, snack preparation',
+            'DAILY: Coffee setup, buttermilk evening'
         ];
         
-        prepTasks.forEach((task, index) => {
-            pdf.text(`* ${task}`, 25, yPos + 30 + (index * 10));
+        // Left column prep tasks
+        prepTasks.slice(0, 3).forEach((task, index) => {
+            pdf.text(`• ${task}`, 20, yPos + 25 + (index * 8));
         });
         
-        // Nutrition Tips
-        yPos += 100;
-        if (yPos > pageHeight - 60) {
-            pdf.addPage();
-            yPos = 30;
-        }
+        // Right column prep tasks  
+        prepTasks.slice(3).forEach((task, index) => {
+            pdf.text(`• ${task}`, rightColumn, yPos + 25 + (index * 8));
+        });
         
+        // NUTRITION TIPS SECTION - Bottom
+        yPos = 275;
+        
+        // Elegant nutrition tips box
         pdf.setFillColor(255, 248, 220);
         pdf.setDrawColor(255, 140, 0);
-        pdf.rect(20, yPos, pageWidth - 40, 45, 'FD');
+        pdf.setLineWidth(2);
+        pdf.rect(15, yPos, pageWidth - 30, 35, 'FD');
         
-        pdf.setTextColor(255, 140, 0);
-        pdf.setFontSize(12);
+        // Tips header
+        pdf.setFillColor(255, 140, 0);
+        pdf.rect(15, yPos, pageWidth - 30, 15, 'F');
+        
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(11);
         pdf.setFont('helvetica', 'bold');
-        pdf.text('COUPLE NUTRITION TIPS', 25, yPos + 12);
+        pdf.text('COUPLE NUTRITION TIPS', pageWidth/2, yPos + 10, {align: 'center'});
         
+        // Compact tips in single row
         pdf.setTextColor(51, 51, 51);
-        pdf.setFontSize(9);
+        pdf.setFontSize(7);
         pdf.setFont('helvetica', 'normal');
         
         const nutritionTips = [
-            '* Start each day together with filter coffee for bonding',
-            '* Use kitchen scale for accurate portion control',
-            '* Take evening walks together after dinner',
-            '* Drink water 30 minutes before meals for better digestion'
+            'Start day with filter coffee together',
+            'Use kitchen scale for portions', 
+            'Evening walks after dinner',
+            'Water 30min before meals'
         ];
         
+        // Display tips in 2x2 grid
         nutritionTips.forEach((tip, index) => {
-            pdf.text(tip, 25, yPos + 25 + (index * 8));
+            const xPos = index < 2 ? 20 : rightColumn;
+            const tipYPos = yPos + 20 + ((index % 2) * 8);
+            pdf.text(`• ${tip}`, xPos, tipYPos);
         });
         
-        // Final Footer
+        // Elegant footer
         pdf.setTextColor(128, 128, 128);
         pdf.setFontSize(8);
-        pdf.text(`Complete Meal Planner for Sethu & Sangeetha | Page 3 of 3`, 25, pageHeight - 10);
+        pdf.setFont('helvetica', 'italic');
+        pdf.text(`Personalized Meal Planner for Sethu & Sangeetha | Week of ${weekDays[0].dateStr} to ${weekDays[6].dateStr}`, pageWidth/2, pageHeight - 10, {align: 'center'});
     }
 
     getCategoryItems(categoryName) {
