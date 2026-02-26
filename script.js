@@ -716,7 +716,10 @@ class NutritionCalculator {
     }
 
     addFoodToPerson(person, name, calories, protein, carbs, fat) {
+        console.log('Adding food to person:', person, 'Food:', name); // Debug log
+        
         const userData = this.userData.couple[person];
+        console.log('User data before:', JSON.stringify(userData)); // Debug log
         
         // Add to person's daily totals
         userData.calories += calories;
@@ -733,6 +736,8 @@ class NutritionCalculator {
             fat,
             timestamp: new Date().toLocaleTimeString()
         });
+
+        console.log('User data after:', JSON.stringify(userData)); // Debug log
 
         // Update displays
         this.updateNutritionDisplay();
@@ -880,11 +885,15 @@ class NutritionCalculator {
 
     updateFoodLog() {
         const foodLogList = document.getElementById('foodLogList');
+        console.log('Updating food log. Current user:', this.currentUser); // Debug log
         
         if (this.currentUser === 'couple') {
             // Show combined food log for couple
             const sethuLog = this.userData.couple.sethu.foodLog;
             const sangeethaLog = this.userData.couple.sangeetha.foodLog;
+            
+            console.log('Sethu log:', sethuLog); // Debug log
+            console.log('Sangeetha log:', sangeethaLog); // Debug log
             
             if (sethuLog.length === 0 && sangeethaLog.length === 0) {
                 foodLogList.innerHTML = '<div class="empty-state"><h3>No foods logged today</h3><p>Start adding South Indian foods to track nutrition for Sethu & Sangeetha!</p></div>';
@@ -895,7 +904,7 @@ class NutritionCalculator {
             
             if (sethuLog.length > 0) {
                 html += '<div class="person-food-section">';
-                html += '<h4 style="color: var(--primary-color); margin-bottom: 15px;">👨 Sethu\'s Food Log (' + sethuLog.length + ' items)</h4>';
+                html += '<h4 style="color: var(--primary-color); margin-bottom: 15px;">Sethu\'s Food Log (' + sethuLog.length + ' items)</h4>';
                 html += sethuLog.map((food, index) => 
                     '<div class="log-entry sethu-entry">' +
                     '<div class="log-entry-info">' +
@@ -913,7 +922,7 @@ class NutritionCalculator {
             
             if (sangeethaLog.length > 0) {
                 html += '<div class="person-food-section">';
-                html += '<h4 style="color: var(--primary-color); margin-bottom: 15px; margin-top: ' + (sethuLog.length > 0 ? '25px' : '0') + ';">👩 Sangeetha\'s Food Log (' + sangeethaLog.length + ' items)</h4>';
+                html += '<h4 style="color: var(--primary-color); margin-bottom: 15px; margin-top: ' + (sethuLog.length > 0 ? '25px' : '0') + ';">Sangeetha\'s Food Log (' + sangeethaLog.length + ' items)</h4>';
                 html += sangeethaLog.map((food, index) => 
                     '<div class="log-entry sangeetha-entry">' +
                     '<div class="log-entry-info">' +
@@ -1116,7 +1125,26 @@ class NutritionCalculator {
     loadUserData() {
         const savedData = localStorage.getItem('nutritionCalcData');
         if (savedData) {
-            this.userData = JSON.parse(savedData);
+            const parsedData = JSON.parse(savedData);
+            
+            // Ensure the couple structure exists in loaded data
+            if (!parsedData.couple) {
+                parsedData.couple = {
+                    sethu: { calories: 0, protein: 0, carbs: 0, fat: 0, foodLog: [] },
+                    sangeetha: { calories: 0, protein: 0, carbs: 0, fat: 0, foodLog: [] }
+                };
+            }
+            
+            // Ensure sethu and sangeetha exist
+            if (!parsedData.couple.sethu) {
+                parsedData.couple.sethu = { calories: 0, protein: 0, carbs: 0, fat: 0, foodLog: [] };
+            }
+            if (!parsedData.couple.sangeetha) {
+                parsedData.couple.sangeetha = { calories: 0, protein: 0, carbs: 0, fat: 0, foodLog: [] };
+            }
+            
+            this.userData = parsedData;
+            console.log('Loaded user data:', this.userData); // Debug log
         }
     }
 
