@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>South Indian Nutrition Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍛 South Indian Nutrition Calculator</h1>
+            <p>Personalized Nutrition Tracking for Couples & Individuals</p>
+        </header>
+
+        <main>
+            <div class="user-selector">
+                <h2>Select User Profile</h2>
+                <div class="user-buttons">
+                    <button id="user1Btn" class="user-btn active" data-user="1">Adult 1</button>
+                    <button id="user2Btn" class="user-btn" data-user="2">Adult 2</button>
+                    <button id="coupleBtn" class="user-btn couple-btn" data-user="couple">👫 Sethu & Sangeetha</button>
+                </div>
+            </div>
+
+            <div class="nutrition-summary">
+                <h2 id="summaryTitle">Daily Nutrition Summary - <span id="currentUser">Adult 1</span></h2>
+                
+                <!-- Single User View -->
+                <div id="singleUserView" class="summary-grid">
+                    <div class="summary-card">
+                        <h3>Calories</h3>
+                        <div class="progress-circle">
+                            <span id="calorieCount">0</span>/<span id="calorieTarget" class="target">1700</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="calorieProgress" class="progress-fill"></div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Protein (g)</h3>
+                        <div class="nutrient-display">
+                            <span id="proteinCount">0</span>/<span id="proteinTarget" class="target">85</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="proteinProgress" class="progress-fill"></div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Carbs (g)</h3>
+                        <div class="nutrient-display">
+                            <span id="carbCount">0</span>/<span id="carbTarget" class="target">213</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="carbProgress" class="progress-fill"></div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Fat (g)</h3>
+                        <div class="nutrient-display">
+                            <span id="fatCount">0</span>/<span id="fatTarget" class="target">57</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="fatProgress" class="progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Couple View -->
+                <div id="coupleView" class="couple-summary" style="display: none;">
+                    <div class="couple-grid">
+                        <div class="person-summary">
+                            <h3>👨 Sethu (Husband) - 1700 cal target</h3>
+                            <div class="person-stats">
+                                <div class="stat-item">
+                                    <span class="label">Calories:</span>
+                                    <span id="sethuCalories">0</span>/1700
+                                    <div class="mini-progress">
+                                        <div id="sethuCalorieProgress" class="mini-progress-fill"></div>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="label">Protein:</span>
+                                    <span id="sethuProtein">0</span>/85g
+                                </div>
+                            </div>
+                        </div>
+                        <div class="person-summary">
+                            <h3>👩 Sangeetha (Wife) - 1500 cal target</h3>
+                            <div class="person-stats">
+                                <div class="stat-item">
+                                    <span class="label">Calories:</span>
+                                    <span id="sangeethaCalories">0</span>/1500
+                                    <div class="mini-progress">
+                                        <div id="sangeethaCalorieProgress" class="mini-progress-fill"></div>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="label">Protein:</span>
+                                    <span id="sangeethaProtein">0</span>/75g
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="food-selector">
+                <h2>Add South Indian Food</h2>
+                <div class="search-container">
+                    <input type="text" id="foodSearch" placeholder="Search for South Indian dishes...">
+                    <button id="searchBtn">Search</button>
+                </div>
+                
+                <div class="food-categories">
+                    <button class="category-btn active" data-category="all">All Foods</button>
+                    <button class="category-btn" data-category="rice">Rice Dishes</button>
+                    <button class="category-btn" data-category="curry">Curries</button>
+                    <button class="category-btn" data-category="snacks">Snacks</button>
+                    <button class="category-btn" data-category="proteins">Proteins</button>
+                    <button class="category-btn" data-category="fruits">Fruits</button>
+                    <button class="category-btn" data-category="nuts_seeds">Nuts & Seeds</button>
+                    <button class="category-btn" data-category="sweets">Sweets</button>
+                    <button class="category-btn" data-category="beverages">Beverages</button>
+                </div>
+
+                <!-- Unit Toggle -->
+                <div class="unit-toggle-section">
+                    <button id="unitToggleBtn" class="unit-toggle-btn">
+                        <span id="unitToggleText">Units: Metric (g/kg)</span>
+                        <span id="unitToggleIcon">🔄</span>
+                    </button>
+                </div>
+
+                <!-- Food Menu Toggle -->
+                <div class="menu-toggle-section">
+                    <button id="menuToggleBtn" class="menu-toggle-btn">
+                        <span id="menuToggleText">Show Food Menu</span>
+                        <span id="menuToggleIcon">▼</span>
+                    </button>
+                </div>
+
+                <div id="foodResults" class="food-grid collapsed">
+                    <!-- Food items will be populated here -->
+                </div>
+            </div>
+
+            <div class="food-log">
+                <h2 id="foodLogTitle">Today's Food Log - <span id="logUser">Adult 1</span></h2>
+                <div id="foodLogList" class="food-log-list">
+                    <!-- Food log entries will appear here -->
+                </div>
+                <div class="food-log-actions">
+                    <button id="clearLog" class="clear-btn">Clear Today's Log</button>
+                </div>
+            </div>
+
+            <div class="pdf-generator">
+                <h2>📋 Beautiful Weekly Meal Planner</h2>
+                <p>Generate a stunning 3-page PDF with complete meal planning for couples</p>
+                
+                <div class="pdf-controls">
+                    <div class="week-selector">
+                        <label for="weekSelect">Select Week:</label>
+                        <select id="weekSelect">
+                            <option value="current">This Week</option>
+                            <option value="next">Next Week</option>
+                            <option value="custom">Custom Week</option>
+                        </select>
+                        <input type="date" id="customDate" style="display: none;">
+                    </div>
+                    
+                    <div class="pdf-features">
+                        <h4>📄 3-Page PDF Includes:</h4>
+                        <div class="pdf-features-grid">
+                            <div class="feature-item">
+                                <span class="feature-icon">📖</span>
+                                <div class="feature-text">
+                                    <strong>Page 1: Cover & Overview</strong>
+                                    <small>Couple profiles, calorie targets, features</small>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🛒</span>
+                                <div class="feature-text">
+                                    <strong>Page 2: Shopping List</strong>
+                                    <small>Organized by categories with smart tips</small>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">📅</span>
+                                <div class="feature-text">
+                                    <strong>Page 3: Meal Plans</strong>
+                                    <small>Daily schedules, prep guide, nutrition tips</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pdf-actions">
+                        <button id="previewPDF" class="pdf-btn preview-btn">�️ Preview Beautiful PDF</button>
+                        <button id="downloadPDF" class="pdf-btn download-btn">⬇️ Download 3-Page PDF</button>
+                    </div>
+                </div>
+                
+                <div id="pdfPreview" class="pdf-preview" style="display: none;">
+                    <h3>📱 PDF Preview</h3>
+                    <div id="previewContent" class="preview-content">
+                        <!-- Beautiful preview content will be displayed here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="portion-guide">
+                <h2>⚖️ Portion Control Guide</h2>
+                <div class="portion-grid">
+                    <div class="portion-card">
+                        <h4>Bowl Servings</h4>
+                        <ul>
+                            <li>Small bowl = 150ml</li>
+                            <li>Medium bowl = 200-250ml</li>
+                            <li>Large bowl = 300ml</li>
+                            <li>Rice cup = 150-200g cooked</li>
+                        </ul>
+                    </div>
+                    <div class="portion-card">
+                        <h4>Measuring Spoons</h4>
+                        <ul>
+                            <li>1 tablespoon = 15ml</li>
+                            <li>1 teaspoon = 5ml</li>
+                            <li>1/2 teaspoon = 2.5ml</li>
+                            <li>4 tablespoons = 1/4 cup = 60ml</li>
+                        </ul>
+                    </div>
+                    <div class="portion-card">
+                        <h4>Hand Measurements</h4>
+                        <ul>
+                            <li>Palm = 100g protein</li>
+                            <li>Cupped hand = 1/2 cup</li>
+                            <li>Thumb = 1 tablespoon</li>
+                            <li>Fingertip = 1 teaspoon</li>
+                        </ul>
+                    </div>
+                    <div class="portion-card">
+                        <h4>Kitchen Scale Tips</h4>
+                        <ul>
+                            <li>Weigh rice after cooking</li>
+                            <li>Weigh meat before cooking</li>
+                            <li>Use grams for accuracy</li>
+                            <li>Zero/tare the bowl weight</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="diet-chart-section">
+                <h2>Personalized Diet Chart</h2>
+                <div class="diet-tabs">
+                    <button class="diet-tab-btn active" data-tab="hydration">Hydration</button>
+                    <button class="diet-tab-btn" data-tab="breakfast">Breakfast</button>
+                    <button class="diet-tab-btn" data-tab="lunch">Lunch</button>
+                    <button class="diet-tab-btn" data-tab="dinner">Dinner</button>
+                    <button class="diet-tab-btn" data-tab="restrictions">Restrictions</button>
+                    <button class="diet-tab-btn couple-diet-btn" data-tab="couple-plan">👫 Couple Plan</button>
+                </div>
+                
+                <div id="dietContent" class="diet-content">
+                    <!-- Diet chart content will be populated here -->
+                </div>
+            </div>
+
+            <div class="recommendations">
+                <h2>Food Habit Recommendations</h2>
+                <div id="recommendationsList" class="recommendations-list">
+                    <!-- Recommendations will be populated here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
