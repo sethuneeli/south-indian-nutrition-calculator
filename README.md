@@ -26,7 +26,7 @@ A comprehensive web-based nutrition calculator specifically designed for South I
 
 ## 🚀 Live Demo
 
-Visit the live application: [South Indian Nutrition Calculator](https://yourusername.github.io/south-indian-nutrition-calculator)
+Visit the live application: [South Indian Nutrition Calculator](https://sethuneeli.github.io/south-indian-nutrition-calculator)
 
 ## 🛠️ Technology Stack
 
@@ -46,7 +46,7 @@ Visit the live application: [South Indian Nutrition Calculator](https://youruser
 ### Option 2: Local Development
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/south-indian-nutrition-calculator.git
+git clone https://github.com/sethuneeli/south-indian-nutrition-calculator.git
 
 # Navigate to project directory
 cd south-indian-nutrition-calculator
@@ -61,7 +61,7 @@ open index.html   # macOS
 2. Go to Settings → Pages
 3. Select source as "Deploy from a branch"
 4. Choose "main" branch and "/ (root)" folder
-5. Your site will be available at `https://yourusername.github.io/south-indian-nutrition-calculator`
+5. Your site will be available at `https://sethuneeli.github.io/south-indian-nutrition-calculator`
 
 ## 📖 Usage Guide
 
@@ -153,8 +153,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/south-indian-nutrition-calculator/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/south-indian-nutrition-calculator/discussions)
+- **Issues**: [GitHub Issues](https://github.com/sethuneeli/south-indian-nutrition-calculator/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/sethuneeli/south-indian-nutrition-calculator/discussions)
 
 ## 🗺️ Roadmap
 
